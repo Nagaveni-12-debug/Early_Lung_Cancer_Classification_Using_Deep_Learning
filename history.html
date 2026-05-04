@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scan History</title>
+    <style>
+        body { font-family: Arial; background: #eef3f7; padding: 40px; }
+        h1 { text-align: center; color: #1c2b4a; }
+        table {
+            width: 80%;
+            margin: auto;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        th { background: #2575fc; color: white; }
+        .cancer { color: red; font-weight: bold; }
+        .healthy { color: green; font-weight: bold; }
+        a { display: block; text-align: center; margin-top: 20px; }
+    </style>
+</head>
+
+<body>
+
+<h1>Your Scan History</h1>
+
+<table>
+    <tr>
+        <th>Filename</th>
+        <th>Result</th>
+        <th>Confidence</th>
+        <th>Date</th>
+    </tr>
+
+    {% for scan in scans %}
+    <tr>
+        <td>{{ scan.filename }}</td>
+        <td class="{{ 'cancer' if scan.result=='Cancer' else 'healthy' }}">
+            {{ scan.result }}
+        </td>
+        <td>{{ scan.confidence }}%</td>
+        <td>{{ scan.created_at }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="{{ url_for('dashboard') }}">⬅ Back to Dashboard</a>
+
+</body>
+</html>

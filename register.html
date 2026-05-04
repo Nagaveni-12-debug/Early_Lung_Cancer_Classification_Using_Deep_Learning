@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Cancer Detection</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+
+    <style>
+        body {
+            margin: 0; padding: 0;
+            background: url('https://hms.harvard.edu/sites/default/files/media/850-AI-lung-cancer-GettyImages-1409138328.jpg')
+                        no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial;
+        }
+
+        .auth-container {
+            height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            backdrop-filter: blur(4px) brightness(0.9);
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="auth-container">
+    <div class="auth-card">
+
+        <div class="auth-header">
+            <h1><i class="fas fa-user-plus"></i> Register</h1>
+            <p>Create your account</p>
+        </div>
+
+        <div class="auth-body">
+
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% for category, message in messages %}
+                    <div class="alert {{ 'alert-error' if category=='error' else 'alert-success' }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endwith %}
+
+            <form method="POST">
+
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" name="confirm_password" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-user-plus"></i> Register
+                </button>
+
+            </form>
+        </div>
+
+        <div class="auth-footer">
+            <p>Already have an account?
+                <a href="{{ url_for('login') }}" class="auth-link">Login here</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

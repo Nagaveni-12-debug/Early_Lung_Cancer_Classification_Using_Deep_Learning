@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detection Result</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body { font-family: Poppins, Arial; background:#eef2ff; margin:0; padding:30px; display:flex; justify-content:center; }
+        .container { width:1100px; background:white; padding:25px; border-radius:14px; box-shadow:0 6px 20px rgba(0,0,0,0.08); }
+        .row { display:flex; gap:25px; }
+
+        .left img { width:100%; border-radius:10px; }
+        .right h2 { color:#1e293b; margin-bottom:8px; }
+        .label { font-weight:600; margin-top:10px; }
+
+        .green { color:#0ea44e; }
+        .red { color:#e11d48; }
+
+        table { width:100%; margin-top:15px; border-collapse:collapse; }
+        td { padding:6px 4px; border-bottom:1px solid #e2e8f0; }
+
+        .btn { padding:10px 30px; background:#2563eb; color:white; border:none;
+               border-radius:8px; cursor:pointer; margin-right:8px; text-decoration:none; }
+
+        .back { background:#475569; }
+
+        /* NEW: Report Box */
+        .report-box {
+            background:#f8fafc;
+            padding:15px;
+            margin-top:20px;
+            border-left:5px solid #2563eb;
+            border-radius:8px;
+        }
+        .report-box h3 {
+            margin-top:0;
+            color:#1e293b;
+        }
+        .report-box p {
+            margin:6px 0;
+            color:#334155;
+            line-height:1.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+
+        <div class="left" style="flex:1;">
+            <img src="/{{ filename }}" alt="scan result">
+        </div>
+
+        <div class="right" style="flex:1.2;">
+            <h2><i class="fas fa-stethoscope"></i> Detection Result</h2>
+
+            {% if result_text == "Healthy" %}
+                <h3 class="green">✔ No Cancer Detected</h3>
+            {% else %}
+                <h3 class="red">⚠ Cancer Detected</h3>
+                {% if subtype %}
+                    <p><strong>Subtype:</strong> {{ subtype }}</p>
+                {% endif %}
+            {% endif %}
+
+            <p class="label">Model Confidence: <strong>{{ confidence }}%</strong></p>
+
+            <h3>Class Probabilities</h3>
+            <table>
+                {% for cls, val in probs.items() %}
+                <tr>
+                    <td>{{ cls }}</td>
+                    <td><strong>{{ val }}%</strong></td>
+                </tr>
+                {% endfor %}
+            </table>
+
+            <!-- ✅ NEW: AI Interpretation Section -->
+            <div class="report-box">
+                <h3>AI Interpretation</h3>
+
+                {% if result_text == "Cancer" %}
+                    
+                    {% if subtype == "adenocarcinoma" %}
+                        <p>The scan shows a higher probability of <b>Adenocarcinoma</b>
+                        ({{ probs['adenocarcinoma'] }}%).</p>
+
+                        {% if probs['normal'] > 30 %}
+                            <p>However, the system also found a noticeable probability for 
+                            <b>Normal</b> ({{ probs['normal'] }}%). This means the case is 
+                            <b>not fully certain</b> and should be reviewed by a radiologist.</p>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if subtype == "large.cell.carcinoma" %}
+                        <p>The scan indicates a likelihood of <b>Large Cell Carcinoma</b>.</p>
+                    {% endif %}
+
+                    {% if subtype == "squamous.cell.carcinoma" %}
+                        <p>The scan suggests a strong probability of 
+                        <b>Squamous Cell Carcinoma</b>.</p>
+                    {% endif %}
+
+                    <p><b>Recommendation:</b> This is an AI-based prediction.  
+                    Please consult a medical professional for confirmation.</p>
+
+                {% else %}
+                    <p>The scan appears <b>Healthy</b> with {{ probs['normal'] }}% confidence.</p>
+                    <p>No cancer indicators were strongly detected.  
+                    Still, consult a doctor if symptoms persist.</p>
+                {% endif %}
+            </div>
+
+            <br>
+            <a href="{{ url_for('predict') }}" class="btn">Analyze Another</a>
+            <a href="{{ url_for('dashboard') }}" class="btn back">Back to Dashboard</a>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

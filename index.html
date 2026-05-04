@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancer Detection System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: url('https://hms.harvard.edu/sites/default/files/media/850-AI-lung-cancer-GettyImages-1409138328.jpg')
+                        no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Slight blur over background */
+        .auth-container {
+            backdrop-filter: blur(4px) brightness(0.9);
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1><i class="fas fa-laptop-medical"></i> CancerDetect</h1>
+                <p>AI-Powered Lung Cancer Detection System</p>
+            </div>
+
+            <div class="auth-body text-center">
+                <h2>Welcome</h2>
+                <p class="mb-4">Early detection saves lives</p>
+
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <a href="{{ url_for('login') }}" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                    <a href="{{ url_for('register') }}" class="btn btn-secondary">
+                        <i class="fas fa-user-plus"></i> Register
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

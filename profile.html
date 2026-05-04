@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Profile</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 30px;
+            font-family: Poppins, Arial;
+            background: #eef2ff;
+        }
+
+        .profile-container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            color: #1e293b;
+        }
+
+        .profile-row {
+            margin-top: 20px;
+        }
+
+        .label {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .btn {
+            margin-top: 25px;
+            display: inline-block;
+            padding: 12px 24px;
+            background: #2563eb;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+<div class="profile-container">
+
+    <h2><i class="fas fa-user-circle"></i> Profile Information</h2>
+
+    <div class="profile-row">
+        <div class="label">Username</div>
+        <div class="value">{{ username }}</div>
+    </div>
+
+    <div class="profile-row">
+        <div class="label">Email</div>
+        <div class="value">{{ email }}</div>
+    </div>
+
+    <a href="{{ url_for('dashboard') }}" class="btn">Back to Dashboard</a>
+
+</div>
+</body>
+</html>

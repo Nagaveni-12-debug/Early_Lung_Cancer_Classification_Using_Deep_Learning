@@ -1,0 +1,129 @@
+<!-- templates/predict.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Upload Lung CT/X-ray - Analyze</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+    <style>
+        body { font-family: "Poppins", Arial; background: #eef6ff; margin:0; padding:30px; display:flex; justify-content:center; }
+        .container { width:1100px; max-width:95%; }
+        h1 { color:#0f172a; margin-bottom:6px; }
+        p.subtitle { color:#64748b; margin-bottom:20px; }
+        .row { display:flex; gap:24px; }
+        .box { flex:1; background:white; border-radius:12px; padding:18px; box-shadow:0 6px 20px rgba(2,6,23,0.06); min-height:320px; display:flex; flex-direction:column; }
+        .upload-box { background: linear-gradient(135deg,#edf7ff, #eaf3ff); border:2px dashed #2d80ff; align-items:center; justify-content:center; display:flex; cursor:pointer; border-radius:10px; padding:18px; min-height:220px; }
+        .upload-box img { width:84px; opacity:0.95; }
+        .preview { width:100%; height:240px; object-fit:contain; border-radius:8px; background:#f8fafc; display:block; }
+        .no-preview { color:#64748b; margin-top:30px; text-align:center; }
+        .analyze-btn { margin:26px auto 0; display:block; padding:14px 36px; background:#10b981; color:white; border:none; border-radius:10px; font-size:18px; cursor:pointer; box-shadow:0 8px 30px rgba(16,185,129,0.12); }
+        .analyze-btn:disabled { opacity:0.6; cursor:not-allowed; }
+        .footer { display:flex; justify-content:space-between; margin-top:18px; align-items:center; }
+        a.link { color:#2563eb; text-decoration:none; font-weight:600; }
+        .note { color:#475569; font-size:14px; }
+        .error { color:#dc2626; margin-top:12px; text-align:center; font-weight:600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-upload"></i> Cancer Detection — Upload Scan</h1>
+        <p class="subtitle">Upload a lung CT or X-ray scan. Supported: PNG, JPG, JPEG, BMP, GIF</p>
+
+        <div class="row">
+            <div class="box">
+                <h3 style="margin:0 0 12px 0;">Upload Scan</h3>
+                <label id="uploadArea" class="upload-box">
+                    <input id="fileInput" type="file" accept="image/*" style="display:none;">
+                    <div>
+                        <img src="https://cdn-icons-png.flaticon.com/512/685/685686.png" alt="upload icon"/>
+                        <div style="text-align:center; margin-top:10px; font-weight:600; color:#0b1220;">Drag & Drop or Click to Upload</div>
+                        <div style="color:#475569; font-size:13px; margin-top:6px;">Please upload raw CT/X-ray (not screenshot)</div>
+                    </div>
+                </label>
+
+                <button id="analyzeBtn" class="analyze-btn" onclick="analyzeImage()" disabled>Analyze</button>
+                <div id="errorMsg" class="error" style="display:none;"></div>
+            </div>
+
+            <div class="box">
+                <h3 style="margin:0 0 12px 0;">Image Preview</h3>
+                <img id="previewImg" class="preview" style="display:none;">
+                <div id="noPreview" class="no-preview">No image selected</div>
+
+                <div style="margin-top:12px;" class="note">After analysis you'll see the result page with subtype + probabilities.</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <a href="{{ url_for('dashboard') }}" class="link">⬅ Back to Dashboard</a>
+            <a href="{{ url_for('history') }}" class="link">View History ➜</a>
+        </div>
+    </div>
+
+<script>
+const uploadArea = document.getElementById('uploadArea');
+const fileInput = document.getElementById('fileInput');
+const previewImg = document.getElementById('previewImg');
+const noPreview = document.getElementById('noPreview');
+const analyzeBtn = document.getElementById('analyzeBtn');
+const errorMsg = document.getElementById('errorMsg');
+
+uploadArea.addEventListener('click', ()=> fileInput.click());
+fileInput.addEventListener('change', ()=> {
+    const f = fileInput.files[0];
+    if(!f) return;
+    previewImg.src = URL.createObjectURL(f);
+    previewImg.style.display = 'block';
+    noPreview.style.display = 'none';
+    analyzeBtn.disabled = false;
+    errorMsg.style.display='none';
+});
+
+// drag & drop (optional)
+uploadArea.addEventListener('dragover', (e)=> { e.preventDefault(); uploadArea.style.opacity = 0.9; });
+uploadArea.addEventListener('dragleave', ()=> { uploadArea.style.opacity = 1; });
+uploadArea.addEventListener('drop', (e)=> {
+    e.preventDefault();
+    uploadArea.style.opacity = 1;
+    const f = e.dataTransfer.files[0];
+    if(!f) return;
+    fileInput.files = e.dataTransfer.files;
+    previewImg.src = URL.createObjectURL(f);
+    previewImg.style.display = 'block';
+    noPreview.style.display = 'none';
+    analyzeBtn.disabled = false;
+    errorMsg.style.display='none';
+});
+
+function analyzeImage(){
+    const f = fileInput.files[0];
+    if(!f){ errorMsg.textContent = "Please select an image."; errorMsg.style.display='block'; return; }
+    analyzeBtn.disabled = true;
+    analyzeBtn.textContent = "Analyzing...";
+
+    const fd = new FormData();
+    fd.append('file', f);
+
+    fetch('/analyze', { method:'POST', body: fd })
+    .then(r => r.json())
+    .then(j => {
+        if(j.success){
+            window.location.href = '/results';
+        } else {
+            errorMsg.textContent = j.error || "Analysis failed";
+            errorMsg.style.display = 'block';
+        }
+    })
+    .catch(e=>{
+        errorMsg.textContent = "Request failed: " + (e.message || e);
+        errorMsg.style.display = 'block';
+    })
+    .finally(()=>{
+        analyzeBtn.disabled = false;
+        analyzeBtn.textContent = "Analyze";
+    });
+}
+</script>
+</body>
+</html>
